@@ -7,26 +7,27 @@
 
 using namespace std;
 
-/* All our files will be stored in the /var/lib/deadline directory
-   of delenn so they can be accessed easily by the user
+/* 
+	All our files will be stored in the /var/lib/deadline directory
+   	of delenn so they can be accessed easily by the user
 
-   This code will list all the files present in the directory
-   to help keep list of what we have
+   	This code will list all the files present in the directory
+   	to help keep list of what we have
 
-   Attempting to change the file permissions of all files in the
-   directory to allow rwx by group members and file owners
+   	Attempting to change the file permissions of all files in the
+   	directory to allow rwx permissions for group members and file 
+	owners
 */
 
 void open(char *dir_name)
 {
         DIR *dir; // pointer to directory
         struct dirent *component; // directory contents
-        struct stat info;
+        struct stat info; // info about components (files)
 
 	int chmod(const char *dir_name, mode_t mode);
 
-        // open direcotry
-        dir = opendir(dir_name);
+        dir = opendir(dir_name); // open directory
 
         if(!dir)
         {
