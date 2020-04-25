@@ -60,9 +60,9 @@ int main()
 	vector < map<string, string> > vecCopy;
 
 
-	deadline d("Walk the dog", "2020-05-24 18:00:00");
-	deadline e("Feed the cat", "2020-05-02 11:30:00");
-	deadline f("CSCI proj due", "2020-05-06 23:59:59");
+	deadline d("Walk the dog", "2020-05-24 18:00:00\n");
+	deadline e("Feed the cat", "2020-05-02 11:30:00\n");
+	deadline f("CSCI proj due", "2020-05-06 23:59:59\n");
 	
 	vecCopy = d.getCopy();
 
@@ -87,8 +87,28 @@ int main()
 		boost::archive::text_iarchive ia(ifs);
 		ia >> newVecCopy;
 	}
+
+	//read from file
+
+	string line;
+	int linecount = 1;
+	string phrase = "22 serialization::archive 17 0 0 1 0 0 0 3 0 0 0";
+	int length = phrase.length();
+	ifstream file("./temp.txt");
+
+	if(file.is_open())
+	{
+		while(getline(file, line))
+		{
+			if(linecount == 1)
+				line = line.substr(length, line.length() - length);
+			linecount++;
+			cout << line << '\n' << endl;
+		}
+		file.close();
+	}
+
+	else cout << "Unable to read!" << endl;
+
+	return 0;
 }
-
-
-
-
