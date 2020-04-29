@@ -1,27 +1,44 @@
 #include <iostream>
+#include <sstream>
 #include <ctime>
 #include <time.h>
-int main()
+
+time_t strtot(std::string strtime)
+{
+	time_t deadtime;
+	int yy, mon, dd, hh, mm;
+	struct tm tmform;
+	const char *chtime = strtime.c_str();
+	sscanf(chtime, "%d-%d-%d %d:%d", &yy, &mon, &dd, &hh, &mm);
+	tmform.tm_year = yy - 1900;
+	tmform.tm_mon = mon - 1;
+	tmform.tm_mday = dd;
+	tmform.tm_hour = hh;
+	tmform.tm_min = mm;
+	tmform.tm_isdst = -1;
+	deadtime = mktime(&tmform);
+	return deadtime;
+}
+std::string strdelta(time_t deldeadline)
 {
 	time_t curtime = time(0);
-	char* curdt = ctime(&curtime);
-	std::cout << curdt << std::endl;
-
-	tm demodeadline;
-	demodeadline.tm_year = 120; //2020
-	demodeadline.tm_mon = 4; //may
-	demodeadline.tm_mday = 2; //2
-	demodeadline.tm_hour = 12; //noon
-	demodeadline.tm_min = 0; //on the hour
-	demodeadline.tm_sec = 0;
-	demodeadline.tm_isdst = 1; //account for dst
-	time_t ttdd = mktime(&demodeadline); //convert tm to time_t
-	double delta = difftime(ttdd, curtime);
+	double delta = difftime(deldeadline, curtime);
+	char pos;
+	if(delta > 0)
+	{
+		pos = '+';
+	}
+	else
+	{
+		pos = '-';
+	}
 	int delday = (int)(delta/86400);
 	delta = delta - delday*86400;
 	int delhour = (int)(delta/3600);
 	delta = delta - delhour*3600;
 	int delmin = (int)(delta/60);
-	std::cout <<"(+" << delday << "d, " << delhour << "h" << delmin << "m)"<< std::endl;
-
+	std::ostringstream os;
+	os << "(" << pos << delday << "d, " << delhour << "h" << delmin << "m)";
+	std::string dif = os.str();
+	return dif;
 }
