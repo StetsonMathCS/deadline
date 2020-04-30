@@ -2,6 +2,15 @@
 //(Serialize and Deserialize)
 //Made by Mathew Nitz
 
+//TODO:
+//	Put class files into /var/lib/
+//	Change int hidden to a bool
+//	Remove data structures as those were only to test
+
+
+
+
+
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/map.hpp>
