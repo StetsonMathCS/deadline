@@ -4,8 +4,7 @@
 
 //TODO:
 //	Put class files into /var/lib/
-//	Change int hidden to a bool
-//	Remove data structures as those were only to test
+
 
 
 
@@ -23,10 +22,10 @@
 
 using namespace std;
 
-map<string, string> myMapPersonal;
-map<string, string> myMapClass;
-map<string, string> myMapPersonalHidden;
-map<string, string> myMapClassHidden;
+// map<string, string> myMapPersonal;
+// map<string, string> myMapClass;
+// map<string, string> myMapPersonalHidden;
+// map<string, string> myMapClassHidden;
 
 template <typename T, typename S> 
 ostream& operator<<(ostream& os, const map<T, S>& v) 
@@ -38,7 +37,7 @@ ostream& operator<<(ostream& os, const map<T, S>& v)
     return os; 
 } 
 
-void saveDeadline(string type, int hidden, string title, string time)
+void saveDeadline(string type, bool hidden, string title, string time)
 {
 	if(type == "Personal")
 	{
@@ -114,15 +113,15 @@ void loadDeadlines()
 int main()
 {
 
-	vector < map<string, string> > myPersonal;
-	vector < map<string, string> > myClass;
-	vector < map<string, string> > myPersonalHidden;
-	vector < map<string, string> > myClassHidden;
+// 	vector < map<string, string> > myPersonal;
+// 	vector < map<string, string> > myClass;
+// 	vector < map<string, string> > myPersonalHidden;
+// 	vector < map<string, string> > myClassHidden;
 
-	myPersonal.push_back(myMapPersonal);
-	myClass.push_back(myMapClass);
-	myPersonalHidden.push_back(myMapPersonalHidden);
-	myClassHidden.push_back(myMapClassHidden);
+// 	myPersonal.push_back(myMapPersonal);
+// 	myClass.push_back(myMapClass);
+// 	myPersonalHidden.push_back(myMapPersonalHidden);
+// 	myClassHidden.push_back(myMapClassHidden);
 
 	saveDeadline("Personal", 0, "Walk the dog", "2020-05-24 16:35");
 	saveDeadline("Personal", 1, "Hide the dog", "2020-06-14 14:35");
