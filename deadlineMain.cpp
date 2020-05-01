@@ -5,25 +5,14 @@
 #include <string>
 #include <map>
 #include <unistd.h>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/vector.hpp>
+#include <fstream>
 using namespace std;
 
 //Rachel Babikow, deadline project part 2, task #4
-
-//POSSIBLE FUNCTIONS (to be put in later)
-
-//add:
-// addDeadline(string deadline, string time);
-// addDeadlineHidden(int deadline);
-//remove:
-// removeDeadline(int deadline);
-// removeDeadlineHidden(int deadline);
-//print:
-// printDeadlines()
-// printHiddenDeadlines()
-//edit:
-// editDeadline(int deadline);
-//details:
-// showDetails(int deadline);
 
 //time conversions (done by Ethan)
 time_t strtot(std::string strtime)
@@ -67,6 +56,25 @@ std::string strdelta(time_t deldeadline)
 	return dif;
 }
 
+//print deadline (done my Moe)
+void printDeadline(map<string,string> deadline) {
+  string deadlineName = deadline.begin()->first;
+  string deadlineDate = deadline.begin()->second;
+  string timeDifference = strdelta(strtot(deadlineDate));
+  cout<<deadlineName<<" - "<<deadlineDate<<" "<<timeDifference<<endl;
+}
+
+//print deadlines (done my Moe)
+void printDeadlines(vector<map<string,string>> deadlines) {
+  int i = 1;
+  vector<map<string,string>>::iterator it;
+
+  for(it=deadlines.begin();it!=deadlines.end();it++) {
+    cout<<i<<". ";
+    printDeadline(*it);
+  }
+}
+
 //check if the deadline # is an int
 bool validInt(string deadline) {
 	for (int i = 0; i < deadline.length(); i++) {
@@ -78,33 +86,36 @@ bool validInt(string deadline) {
 }
 
 int main(int argc, char** argv){
-	
-	// used to test (can erase)
-	vector< map <string, string> > myClass;
-        vector< map <string, string> > myPersonal;
-        vector< map <string, string> > myClassHidden;
-        vector< map <string, string> > myPersonalHidden;
-        map<string, string> deadlineOne;
-        map<string, string> deadlineTwo;
-        map<string, string> deadlineThree;
-        map<string, string> deadlineFour;
-        deadlineOne.insert(make_pair("Walk dog", "2001-05-24 10:50"));
-        deadlineTwo.insert(make_pair("Make dinner", "2020-04-18 07:15"));
-        deadlineThree.insert(make_pair("Go to work", "2020-09-18 09:09"));
-        deadlineFour.insert(make_pair("take test", "2021-08-09 10:00"));
-        myClass.push_back(deadlineThree);
-        myPersonal.push_back(deadlineOne);
-        myClassHidden.push_back(deadlineTwo);
-        myPersonalHidden.push_back(deadlineFour);
+
+	//loadDeadlines();
+
+	  // used to test (can erase)
+ //	  vector< map <string, string> > myClass;
+ //       vector< map <string, string> > myPersonal;
+ //       vector< map <string, string> > myClassHidden;
+ //       vector< map <string, string> > myPersonalHidden;
+ //       map<string, string> deadlineOne;
+ //       map<string, string> deadlineTwo;
+ //       map<string, string> deadlineThree;
+ //       map<string, string> deadlineFour;
+ //       deadlineOne.insert(make_pair("Walk dog", "2001-05-24 10:50"));
+ //       deadlineTwo.insert(make_pair("Make dinner", "2020-04-18 07:15"));
+ //       deadlineThree.insert(make_pair("Go to work", "2020-09-18 09:09"));
+ //       deadlineFour.insert(make_pair("take test", "2021-08-09 10:00"));
+ //       myClass.push_back(deadlineThree);
+ //       myPersonal.push_back(deadlineOne);
+ //       myClassHidden.push_back(deadlineTwo);
+ //       myPersonalHidden.push_back(deadlineFour);
 
 
 	//command line: deadline
 	if(argc == 1) {
 		
-		// FUNCTION NEEDED:
-		// printDeadlines();
-
-		cout << "print deadlines" << endl;
+		cout << "\ncsci 221:" << endl;
+		printDeadlines(myClass);
+		cout << "\npersonal:" << endl;
+		printDeadlines(myPersonal);
+		cout << "\n";
 	}
 	
 	//command line: deadline add me "_____"
@@ -130,9 +141,12 @@ int main(int argc, char** argv){
 			string time = (string) argv[4] + "-" + argv[5] + "-" + argv[6] + " " + argv[7];  
 			time_t myTime = strtot(time);
                 	cout << "Added deadline " << '"' << argv[3] << '"' << " " << strdelta(myTime) << endl;
+			string list = "myPersonal";
 
 			// FUNCTION NEEDED:
-			// addDeadlines((string) argv[3], time);
+			// addDeadlines(list, (string) argv[3], time);
+
+			//saveDeadlines();
 
 		} 
 	}
@@ -141,26 +155,31 @@ int main(int argc, char** argv){
 	else if(strcmp(argv[1], "rm") == 0 && argc == 3) {
 		
 		if(validInt(argv[2]) == true) {
-			if(stoi(argv[2]) <= (int) (personalDeadlines.size() + classDeadlines.size()) && stoi(argv[2]) > 0 ) {	
+			if(stoi(argv[2]) <= (int) (myPersonal.size() + myClass.size()) && stoi(argv[2]) > 0 ) {	
 				string name;
 				string date;
-				if(stoi(argv[2]) <= classDeadlines.size()) {
-					for(auto const& pair: classDeadlines[stoi(argv[2])-1] ) {
+				string list;
+				if(stoi(argv[2]) <= myClass.size()) {
+					for(auto const& pair: myClass[stoi(argv[2])-1] ) {
 						name = pair.first;
-						date = pair.second;	
+						date = pair.second;
+						list = "myClass";	
 					}
 				}
-				else if(stoi(argv[2]) <= (int) (personalDeadlines.size() + classDeadlines.size()) ) {
-					for(auto const& pair: personalDeadlines[(personalDeadlines.size()+classDeadlines.size())-stoi(argv[2])] ) {
+				else if(stoi(argv[2]) <= (int) (myClass.size() + myPersonal.size()) ) {
+					for(auto const& pair: myPersonal[(myPersonal.size()+myClass.size())-stoi(argv[2])] ) {
                                                 name = pair.first;
                                                 date = pair.second;
+						list = "myPersonal";
                                         }
 				}
 				time_t myTime = strtot(date);
 				cout << "Removed deadline " << '"' << name << '"' << " " << strdelta(myTime) << endl;
 
 				// FUNCTION NEEDED:
-				// removeDeadline(stoi(argv[2]);
+				// removeDeadline(list, name, date);
+
+				//saveDeadlines();
 
 			}
 			else {
@@ -176,28 +195,35 @@ int main(int argc, char** argv){
 	else if(strcmp(argv[1], "hide") == 0 && argc == 3){
 
 		if(validInt(argv[2]) == true) {
-                        if(stoi(argv[2]) <= (int) (personalDeadlines.size() + classDeadlines.size()) && stoi(argv[2]) > 0) {
+                        if(stoi(argv[2]) <= (int) (myPersonal.size() + myPersonal.size()) && stoi(argv[2]) > 0) {
                                 string name;
                                 string date;
-                                if(stoi(argv[2]) <= classDeadlines.size()) {
-                                        for(auto const& pair: classDeadlines[stoi(argv[2])-1] ) {
+				string list;
+				string hiddenList;
+                                if(stoi(argv[2]) <= myClass.size()) {
+                                        for(auto const& pair: myClass[stoi(argv[2])-1] ) {
                                                 name = pair.first;
                                                 date = pair.second;
+						list = "myClass";
+						hiddenList = "myClassHidden";
                                         }
                                 }
-                                else if(stoi(argv[2]) <= (int) (personalDeadlines.size() + classDeadlines.size()) ) {
-                                        for(auto const& pair: personalDeadlines[(personalDeadlines.size()+classDeadlines.size())-stoi(argv[2])] ) {
+                                else if(stoi(argv[2]) <= (int) (myPersonal.size() + myClass.size()) ) {
+                                        for(auto const& pair: myPersonal[(myPersonal.size()+myClass.size())-stoi(argv[2])] ) {
                                                 name = pair.first;
                                                 date = pair.second;
+						list = "myPersonal";
+						hiddenList = "myPersonalHidden";
                                         }
                                 }
 				time_t myTime = strtot(date);
 				cout << "Hiding deadline " << '"' << name << '"' << " " << strdelta(myTime) << endl;
 				
 				// FUNCTIONS NEEDED:
-				// removeDeadline(stoi(argv[2]);
-                                // addHiddenDeadline(stoi(argv[2]);
+				// addDeadline(hiddenList, name, date);
+				// removeDeadline(list, name, date);
 
+				//saveDeadlines();
                         }
                         else {
                                 cout << "Not a valid deadline" << endl;
@@ -213,35 +239,47 @@ int main(int argc, char** argv){
 		
 		cout << "Print hidden deadlines" << endl;
 		
-		// FUNCTION NEEDED:
-		// printHiddenDeadlines();
+		cout << "\ncsci 221:" << endl;
+                printDeadlines(myClassHidden);
+                cout << "\npersonal:" << endl;
+                printDeadlines(myPersonalHidden);
+                cout << "\n";
+
 	}
 	
 	//command line: deadline unhide #
 	else if(strcmp(argv[1], "unhide") == 0 && argc == 3) {
 		
 		if(validInt(argv[2]) == true) {
-                        if(stoi(argv[2]) <= (int) hiddenClassDeadlines.size() + hiddenPersonalDeadlines.size() && stoi(argv[2]) > 0) {
+                        if(stoi(argv[2]) <= (int) myClassHidden.size() + myPersonalHidden.size() && stoi(argv[2]) > 0) {
 				string name;
 				string date;
-				if(stoi(argv[2]) <= (int) hiddenClassDeadlines.size()) {
-					for(auto const& pair: hiddenClassDeadlines[stoi(argv[2])-1] ) {
+				string list;
+				string hiddenList;
+				if(stoi(argv[2]) <= (int) myClassHidden.size()) {
+					for(auto const& pair: myClassHidden[stoi(argv[2])-1] ) {
                                 		name = pair.first;
                                 		date = pair.second;
+						list = "myClass";
+						hiddenList = "myClassHidden";
                                 	}
 				}
 				else {
-					for(auto const& pair: hiddenPersonalDeadlines[hiddenClassDeadlines.size() + hiddenPersonalDeadlines.size() - stoi(argv[2])] ) {
+					for(auto const& pair: myPersonalHidden[myClassHidden.size() + myPersonalHidden.size() - stoi(argv[2])] ) {
                                                 name = pair.first;
                                                 date = pair.second;
+						list = "myPersonal";
+						hiddenList = "myPersonalHidden";
                                         }
 				}
 				time_t myTime = strtot(date);
 				cout << "Unhiding deadline " << '"' << name << '"' << " " << strdelta(myTime) << endl;
 
 				// FUNCTIONS NEEDED:
-				// addDeadline(name, date);
-                                // removeHiddenDeadline(stoi(argv[2]);
+				// addDeadline(list, name, date);
+                                // removeHiddenDeadline(hiddenList, name, date);
+
+				//saveDeadlines();
                         }
                         else {
                                 cout << "Not a valid deadline" << endl;
@@ -256,11 +294,13 @@ int main(int argc, char** argv){
 	else if(strcmp(argv[1], "details") == 0 && argc == 3) {
 		
 		if(validInt(argv[2]) == true) {
- 			if(stoi(argv[2]) <= (int) (personalDeadlines.size() + classDeadlines.size()) && stoi(argv[2]) > 0 ) {
+ 			if(stoi(argv[2]) <= (int) (myPersonal.size() + myClass.size()) && stoi(argv[2]) > 0 ) {
 				cout << "show details" << endl;
 
 				// FUNTION NEEDED:
 				// showDetails(stoi(argv([2]);
+
+				//saveDeadlines();
                         }
                         else {
                                 cout << "Not a valid deadline" << endl;
@@ -275,18 +315,20 @@ int main(int argc, char** argv){
 	else if(strcmp(argv[1], "edit") == 0 && argc == 3) {
 		
 		 if(validInt(argv[2]) == true) {
-                        if(stoi(argv[2]) <= (int) classDeadlines.size() && stoi(argv[2]) > 0) {
+                        if(stoi(argv[2]) <= (int) myClass.size() && stoi(argv[2]) > 0) {
 				string name;
-				for(auto const& pair: classDeadlines[stoi(argv[2])-1] ) {
+				for(auto const& pair: myClass[stoi(argv[2])-1] ) {
                                         name = pair.first;
                                 }
 				cout << "You cannot edit " << '"' << name << '"' << " since you are not the owner (jeckroth is)." << endl;
 			}
-			else if(stoi(argv[2]) > (int) classDeadlines.size() && stoi(argv[2]) <= (int) (classDeadlines.size() + personalDeadlines.size()) && stoi(argv[2]) > 0) {
+			else if(stoi(argv[2]) > (int) myClass.size() && stoi(argv[2]) <= (int) (myClass.size() + myPersonal.size()) && stoi(argv[2]) > 0) {
                                 cout << "edit deadline " << stoi(argv[2]) << endl;
 				
 				//FUNCTION NEEDED:
 				// editDeadline(stoi(argv[2]);
+
+				//saveDeadlines();
 			}
                         else {
                                 cout << "Not a valid deadline" << endl;
