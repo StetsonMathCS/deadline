@@ -2,14 +2,6 @@
 //(Serialize and Deserialize)
 //Made by Mathew Nitz
 
-//TODO:
-//	Put class files into /var/lib/
-
-
-
-
-
-
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/map.hpp>
@@ -27,106 +19,76 @@ using namespace std;
 // map<string, string> myMapPersonalHidden;
 // map<string, string> myMapClassHidden;
 
-template <typename T, typename S> 
-ostream& operator<<(ostream& os, const map<T, S>& v) 
-{ 
-    for (auto it : v)  
-        os << it.first << " , " 
-           << it.second << "\n"; 
+// template <typename T, typename S> 
+// ostream& operator<<(ostream& os, const map<T, S>& v) 
+// { 
+//     for (auto it : v)  
+//         os << it.first << " , " 
+//            << it.second << "\n"; 
       
-    return os; 
-} 
+//     return os; 
+// } 
 
-void saveDeadline(string type, bool hidden, string title, string time)
+void saveDeadlines()
 {
-	if(type == "Personal")
-	{
-		if(!hidden)
-		{
-			myMapPersonal.insert(pair<string, string>(title, time));
-			ofstream file((string)getenv("HOME") + "/personal.deadline");
-			boost::archive::text_oarchive oa(file);
-			oa << myMapPersonal;
-		}
-		else
-		{
-			myMapPersonalHidden.insert(pair<string, string>(title, time));
-			ofstream file((string)getenv("HOME") + "/personalhidden.deadline");
-			boost::archive::text_oarchive oa(file);
-			oa << myMapPersonalHidden;
-		}
-	}
+	//personal
+	ofstream ofile0((string)getenv("HOME") + "/personal.deadline");
+	boost::archive::text_oarchive oa0(ofile0);
+	oa0 << myMapPersonal;
 
-	else if(type == "Class")
-	{
-		if(!hidden)
-		{
-			myMapClass.insert(pair<string, string>(title, time));
-			ofstream file((string)getenv("HOME") + "/class.deadline");
-			boost::archive::text_oarchive oa(file);
-			oa << myMapClass;
-		}
-		else
-		{
-			myMapClassHidden.insert(pair<string, string>(title, time));
-			ofstream file((string)getenv("HOME") + "/classhidden.deadline");
-			boost::archive::text_oarchive oa(file);
-			oa << myMapClassHidden;
-		}
-	}
-	else
-		cout << "Error (saveDeadline), please specify the type: Personal or Class and if it's hidden (1 for yes, 0 for no)" << endl;
+	//personal hidden
+	ofstream ofile1((string)getenv("HOME") + "/personalhidden.deadline");
+	boost::archive::text_oarchive oa1(ofile1);
+	oa1 << myMapPersonalHidden;
 
+	//class
+	ofstream ofile2("/var/lib/deadline/class.deadline");
+	boost::archive::text_oarchive oa2(ofile2);
+	oa2 << myMapClass;
+
+	//class hidden
+	ofstream ofile3("/var/lib/deadline/classhidden.deadline");
+	boost::archive::text_oarchive oa3(ofile3);
+	oa3 << myMapClassHidden;
 }
 
 void loadDeadlines()
 {
-
-	//use iterators and operator overload to display
 	//personal
 	ifstream file0((string)getenv("HOME") + "/personal.deadline");
 	boost::archive::text_iarchive ia0(file0);
 	ia0 >> myMapPersonal;
-	cout << "Personal Deadlines:\n" << myMapPersonal << endl;
+	// cout << "Personal Deadlines:\n" << myMapPersonal << endl;
 
 	//personal hidden
 	ifstream file1((string)getenv("HOME") + "/personalhidden.deadline");
 	boost::archive::text_iarchive ia1(file1);
 	ia1 >> myMapPersonalHidden;
-	cout << "Personal Hidden Deadlines:\n" << myMapPersonalHidden << endl;
+	// cout << "Personal Hidden Deadlines:\n" << myMapPersonalHidden << endl;
 
 	//class
-	ifstream file2((string)getenv("HOME") + "/class.deadline");
+	ifstream file2("/var/lib/deadline/class.deadline");
 	boost::archive::text_iarchive ia2(file2);
 	ia2 >> myMapClass;
-	cout << "Class Deadlines:\n" << myMapClass << endl;
+	// cout << "Class Deadlines:\n" << myMapClass << endl;
 
 	//class hidden
-	ifstream file3((string)getenv("HOME") + "/classhidden.deadline");
+	ifstream file3("/var/lib/deadline/classhidden.deadline");
 	boost::archive::text_iarchive ia3(file3);
 	ia3 >> myMapClassHidden;
-	cout << "Class Hidden Deadlines:\n" << myMapClassHidden << endl;
-
-
+	// cout << "Class Hidden Deadlines:\n" << myMapClassHidden << endl;	
 }
 
 int main()
 {
+	// myMapPersonal.insert(pair<string, string>("Walk the dog", "2020-05-24 16:35"));
+	// myMapPersonalHidden.insert(pair<string, string>("Hide the dog", "2020-05-24 16:35"));
+	// myMapClass.insert(pair<string, string>("Class Project", "2020-05-24 16:35"));
+	// myMapClassHidden.insert(pair<string, string>("Hidden Class Project", "2020-05-24 16:35"));
 
-// 	vector < map<string, string> > myPersonal;
-// 	vector < map<string, string> > myClass;
-// 	vector < map<string, string> > myPersonalHidden;
-// 	vector < map<string, string> > myClassHidden;
+	saveDeadlines();
 
-// 	myPersonal.push_back(myMapPersonal);
-// 	myClass.push_back(myMapClass);
-// 	myPersonalHidden.push_back(myMapPersonalHidden);
-// 	myClassHidden.push_back(myMapClassHidden);
-
-	saveDeadline("Personal", 0, "Walk the dog", "2020-05-24 16:35");
-	saveDeadline("Personal", 1, "Hide the dog", "2020-06-14 14:35");
-	saveDeadline("Class", 0, "Current Class", "2020-08-03 16:35");
-	saveDeadline("Class", 1, "Future Class", "2020-10-12 16:20");
 	loadDeadlines();
-}
 
+
+}
