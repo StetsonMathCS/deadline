@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <algorithm>
+#include "boost/lexical_cast.hpp"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ void addDeadline(string list, string name, string date)
 		myMapClass.insert(make_pair(name, date));
 		myClass.push_back(myMapClass);
 
+		// printing elements of map, left in here in case my syntax is different 
 		for(it = myMapClass.begin(); it != myMapClass.end(); it++)
 		{	
 			cout << it->first << " ---> " << it->second << endl;
@@ -72,8 +74,11 @@ void addDeadline(string list, string name, string date)
 
 void removeDeadline(string list, string target)
 {
-	map<string, string>::iterator it = myMapClass.find(target);
 	vector <map <string, string> >::iterator it_out;
+	map<string, string>::iterator it = myMapClass.find(target);
+	map<string, string>::iterator it1 = myMapPersonal.find(target);
+	map<string, string>::iterator it2 = myMapPersonalHidden.find(target);
+	map<string, string>::iterator it3 = myMapClassHidden.find(target);
 
 	if(list == "Class") {
 
@@ -82,39 +87,22 @@ void removeDeadline(string list, string target)
 			for(it = myMapClass.begin(); it != myMapClass.end(); it++)
 			{
 				myMapClass.erase(it);
-				
-				if(it_out == target)
-				{
-					myClass.erase(it_out);
-				}
-				//myMapClass.clear();				
-				//cout << it->first << " ---> " << it->second << endl;
-				cout << myMapClass.size() << endl;
 				//myClass.clear();                             
-				//cout << it->first << " ---> " << it->second << endl;
-				cout << myClass.size() << endl;
-
 				break;
 			}
 
 			break;
-		}		
-	} 
+		}
+	}
 
 	else if(list == "Personal") {
 
 		for(it_out = myPersonal.begin(); it_out != myPersonal.end(); it_out++) {
 
-			for(it = myMapPersonal.begin(); it != myMapPersonal.end(); it++)
+			for(it1 = myMapPersonal.begin(); it1 != myMapPersonal.end(); it1++)
 			{
-				myMapPersonal.erase(it);
-				myPersonal.erase(it_out);
-				//myMapClass.clear();                           
-				//cout << it->first << " ---> " << it->second << endl;
-				cout << myMapPersonal.size() << endl;
+				myMapPersonal.erase(it1);
 				//myClass.clear();                             
-				//cout << it->first << " ---> " << it->second << endl;
-				cout << myPersonal.size() << endl;
 
 				break;
 			}       
@@ -127,16 +115,10 @@ void removeDeadline(string list, string target)
 
 		for(it_out = myPersonalHidden.begin(); it_out != myPersonalHidden.end(); it_out++) {
 
-			for(it = myMapPersonalHidden.begin(); it != myMapPersonalHidden.end(); it++)
+			for(it2 = myMapPersonalHidden.begin(); it2 != myMapPersonalHidden.end(); it2++)
 			{
-				myMapPersonalHidden.erase(it);
-				myPersonalHidden.erase(it_out);
-				//myMapClass.clear();                           
-				//cout << it->first << " ---> " << it->second << endl;
-				cout << myMapPersonalHidden.size() << endl;
+				myMapPersonalHidden.erase(it2);
 				//myClass.clear();                             
-				//cout << it->first << " ---> " << it->second << endl;
-				cout << myPersonalHidden.size() << endl;
 
 				break;
 			}
@@ -147,18 +129,13 @@ void removeDeadline(string list, string target)
 
 	else {
 		if(list == "Class Hidden"){
+
 			for(it_out = myPersonal.begin(); it_out != myPersonal.end(); it_out++) {
 
-				for(it = myMapPersonal.begin(); it != myMapPersonal.end(); it++)
+				for(it3 = myMapPersonal.begin(); it3 != myMapPersonal.end(); it3++)
 				{
-					myMapPersonal.erase(it);
-					myPersonal.erase(it_out);
-					//myMapClass.clear();                           
-					//cout << it->first << " ---> " << it->second << endl;
-					cout << myMapPersonal.size() << endl;
+					myMapPersonal.erase(it3);
 					//myClass.clear();                             
-					//cout << it->first << " ---> " << it->second << endl;
-					cout << myPersonal.size() << endl;
 
 					break;
 				}
@@ -168,22 +145,46 @@ void removeDeadline(string list, string target)
 		}
 	}
 }
-void updateDeadline(string name, string date, string update)
+
+void updateDeadline(string list, string target, string update)
 {
-	map<string, string>::iterator it;
+	map<string, string>::iterator it = myMapClass.find(target);
+	map<string, string>::iterator it1 = myMapPersonal.find(target);
+	map<string, string>::iterator it2 = myMapClassHidden.find(target);
+	map<string, string>::iterator it3 = myMapPersonalHidden.find(target);
+
 	vector <map <string, string> >::iterator it_out;
 
+	if(list == "Class") {
+
+		for(it_out = myClass.begin(); it_out != myClass.end(); it_out++) 
+		{
+			for(it = myMapClass.begin(); it != myMapClass.end(); it++)
+			{	
+				myMapClass[update] = it->second;
+				cout << update << " ---> " << it->second << endl;
+				myMapClass.erase(it->first);	
+				break;
+			}
+	
+			break;
+		}
+	}
 }
 
 int main()
 {
-	addDeadline("Class", "CHEM EXAM", "2020-04-30");
-	addDeadline("Personal", "Cook dinner", "2020-05-01" );
-	addDeadline("Personal Hidden", "Gym 6:30pm", "2020-05-01");
-	addDeadline("Class Hidden", "Review C++ syntax", "2020-05-09");
+	addDeadline("Class", "Chem Exam", "April 30th, 2020");
+	addDeadline("Personal", "Cook dinner", "May 1st, 2020" );
+	addDeadline("Personal Hidden", "Gym", "May 2nd, 2020");
+	addDeadline("Class Hidden", "Review C++", "May 9th, 2020");
 
-	removeDeadline("Class", "CHEM EXAM");
-	removeDeadline("Personal Hidden", "Gym 6:30pm");
+	updateDeadline("Class", "Chem Exam", "Math Exam");
+
+	removeDeadline("Class", "Chem Exam");
+	removeDeadline("Personal", "Cook dinner");
+	removeDeadline("Personal Hidden", "Gym");         
+	removeDeadline("Class Hidden", "Review C++");	
 
 	return 0;
 }
